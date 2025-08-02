@@ -1,6 +1,8 @@
-const fetchCard = async () => {
+const fetchCard = async (level) => {
+
+  console.log('fetching with', level)
   try {
-    const total = 75
+    const total = level
     const randomIds = new Set()
 
     while (randomIds.size < 10) {

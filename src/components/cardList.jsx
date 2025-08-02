@@ -1,15 +1,28 @@
 import { useEffect, useState, useRef } from 'react'
 
-export default function CardList({ cards, setCards, nextCards, setNextCards, clickedCards, setClickedCards, score, setScore, prepareCards }) {
+export default function CardList({ cards, setCards, nextCards, setNextCards, clickedCards, setClickedCards, score, setScore, prepareCards, level }) {
   const cardBoxRef = useRef(null)
   const [lastClicked, setLastClicked] = useState(false)
+  const [spinTrigger, setSpinTrigger] = useState(false);
+
+  const buzzer = new Audio('./sounds/buzzer.mp3');
+  const ding = new Audio('./sounds/ding.mp3');
+  const woosh = new Audio('./sounds/woosh.mp3');
+
+  const handleClick = (sound) => {
+    sound.currentTime = 0;
+    sound.play();
+  };
 
   useEffect(() => {
     if (lastClicked && cardBoxRef.current) {
-      cardBoxRef.current.focus()
+      setTimeout(() => {
+        cardBoxRef.current?.focus()
+      }, 10)
       setLastClicked(false)
     }
   }, [cards, lastClicked])
+  
 
   return (
     <div 
@@ -19,28 +32,30 @@ export default function CardList({ cards, setCards, nextCards, setNextCards, cli
     >
       {cards.map((card) => (
         <button
-          className='card'
+          className={`card ${spinTrigger ? 'spin' : ''}`}
           key={card.name}
           tabIndex={0}
           onClick={() => {
             const isDuplicate = checkIfDuplicate(clickedCards, card.name)
-
+          
             if (isDuplicate) {
-              alert('you lost, best score - ' + score)
+              handleClick(buzzer)
               setScore(0)
               setClickedCards([])
             } else {
+              handleClick(ding)
               const newClicked = [...clickedCards, card.name]
               setClickedCards(newClicked)
               setScore(score + 1)
-              console.log("keep it coming! score is " + (score + 1))
             }
-
+          
             setCards(nextCards)
-            prepareCards(setNextCards, false)
-            setLastClicked(true)
-            console.log(card.name, 'was clicked')
-          }}
+            prepareCards(setNextCards, level, false)
+          
+            setSpinTrigger(false)
+            setTimeout(() => setSpinTrigger(true), 100)
+            setTimeout(() => handleClick(woosh), 200)
+          }}     
         >
           <img src={card.url} alt="" /> {card.name}
         </button>

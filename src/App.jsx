@@ -4,13 +4,14 @@ import { Modal, ModalContent } from './components/modal'
 import Header from './components/header'
 import { ShowScore } from './components/showScore'
 import CardList from './components/cardList'
+import StartPage from './components/startPage'
 
-const prepareCards = (setNextCards, setCards = false) => {
+const prepareCards = (setNextCards, level, setCards = false) => {
   if (setCards) {
-    fetchCard().then(data => setCards(data))
+    fetchCard(level).then(data => setCards(data))
   }
 
-  fetchCard().then(data => setNextCards(data))
+  fetchCard(level).then(data => setNextCards(data))
 }
 
 function App() {
@@ -21,6 +22,9 @@ function App() {
   const [clickedCards, setClickedCards] = useState([])
   const [score, setScore] = useState(0)
   const [bestScore, setBestScore] = useState(0)
+  const [mainPageIsOpen, setMainPageIsOpen] = useState(false)
+  const [animateMainPage, setAnimateMainPage] = useState(false)
+  const [level, setLevel] = useState(70)
 
   const handleRuleButtonClick = () => {
     setModalOpen(true);
@@ -34,12 +38,14 @@ function App() {
   }, [score])
 
   useEffect(() => {
-    console.log(bestScore)
-  }, [bestScore])
+    prepareCards(setNextCards, level, setCards)
+  }, [])
 
   useEffect(() => {
-    prepareCards(setNextCards, setCards)
-  }, [])
+    if (mainPageIsOpen) {
+      setTimeout(() => setAnimateMainPage(true), 10)
+    }
+  }, [mainPageIsOpen])
 
   useEffect(() => {
     console.log(clickedCards)
@@ -47,26 +53,39 @@ function App() {
 
   return (
     <>
-      <Header handleRuleButtonClick={handleRuleButtonClick} />
 
-      <CardList
-        cards={cards}
-        setCards={setCards} 
-        nextCards={nextCards} 
-        setNextCards={setNextCards} 
-        clickedCards={clickedCards} 
-        setClickedCards={setClickedCards} 
-        score={score} setScore={setScore} 
-        prepareCards={prepareCards} 
-      />
+    {!mainPageIsOpen && (
+      <>
+        <StartPage setLevel={setLevel} level={level} setMainPageIsOpen={setMainPageIsOpen} />
+      </>
+    )}
 
-      <ShowScore score={score} bestScore={bestScore} />
-
-      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
-        {modalContent}
-      </Modal>
+      {mainPageIsOpen && (
+        <div className={`mainPage ${animateMainPage ? 'show' : ''}`}>
+          <Header handleRuleButtonClick={handleRuleButtonClick} />
+  
+          <CardList
+            cards={cards}
+            setCards={setCards}
+            nextCards={nextCards}
+            setNextCards={setNextCards}
+            clickedCards={clickedCards}
+            setClickedCards={setClickedCards}
+            score={score}
+            setScore={setScore}
+            prepareCards={prepareCards}
+            level={level}
+          />
+  
+          <ShowScore score={score} bestScore={bestScore} />
+  
+          <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+            {modalContent}
+          </Modal>
+        </div>
+      )}
     </>
-  )
+  )  
 }
 
 export default App;
