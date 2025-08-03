@@ -1,45 +1,22 @@
-import { useState, useEffect } from "react";
-
 export default function StartPage({ setMainPageIsOpen, level, setLevel }) {
-  const [selected, setSelected] = useState(null)
-
-  const changeLevelToNumber = (level) => {
-    if (level === 'easy') {
-      return 100
-    } else if (level === 'normal') {
-      return 75
-    } else {
-      return 50
-    }
-  }
-
-  useEffect(() => {
-    if (selected !== null) {
-      setLevel(changeLevelToNumber(selected))
-    }
-  }, [selected])
+  const selected = (() => {
+    if (level === 100) return 'easy'
+    if (level === 75) return 'normal'
+    if (level === 50) return 'hard'
+    return null
+  })()
 
   return (
     <div className="startPage">
       <video autoPlay muted loop playsInline className="background-video">
-        <source
-          src={"/img/charizard.mp4"}
-          type="video/mp4"
-        />
+        <source src={"/img/charizard.mp4"} type="video/mp4" />
       </video>
 
       <div className="startButtons">
         <div className="levels">
-          <button className={selected === 'easy' ? 'selected' : ''} onClick={() => setSelected('easy')}>
-            Easy
-          </button>
-          <button className={selected === 'normal' ? 'selected' : ''} onClick={() => setSelected('normal')}>
-            Normal
-          </button>
-          <button className={selected === 'hard' ? 'selected' : ''} onClick={() => setSelected('hard')}>
-            Hard
-          </button>
-
+          <button className={selected === 'easy' ? 'selected' : ''} onClick={() => setLevel(100)}>Easy</button>
+          <button className={selected === 'normal' ? 'selected' : ''} onClick={() => setLevel(75)}>Normal</button>
+          <button className={selected === 'hard' ? 'selected' : ''} onClick={() => setLevel(50)}>Hard</button>
         </div>
         <button onClick={() => setMainPageIsOpen(true)}>start game</button>
       </div>

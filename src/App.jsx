@@ -24,7 +24,7 @@ function App() {
   const [bestScore, setBestScore] = useState(0)
   const [mainPageIsOpen, setMainPageIsOpen] = useState(false)
   const [animateMainPage, setAnimateMainPage] = useState(false)
-  const [level, setLevel] = useState(70)
+  const [level, setLevel] = useState(74)
 
   const handleRuleButtonClick = () => {
     setModalOpen(true);
