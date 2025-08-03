@@ -19,10 +19,6 @@ export default function StartPage({ setMainPageIsOpen, level, setLevel }) {
     }
   }, [selected])
 
-  useEffect(() => {
-    console.log('level is', level)
-  }, [level])
-
   return (
     <div className="startPage">
       <video autoPlay muted loop playsInline className="background-video">

@@ -1,4 +1,5 @@
 import { FocusTrap } from 'focus-trap-react'
+import { useState, useEffect } from 'react';
 
 function ModalContent() {
   return (
@@ -26,14 +27,57 @@ function ModalContent() {
   )
 }
 
+function ModalGameOver({ setModalOpen, setMainPageIsOpen, sound }) {
+  let sounds = setTimeout(() => {
+    sound()
+  }, 2000)
+
+  return (
+    <>
+      <div className='container'>
+        <button className='startButtons flameHover' onClick={() =>{
+          setModalOpen(false)
+          clearTimeout(sounds)
+        }}>
+          Play again
+        </button>
+        <button className='startButtons flameHover' onClick={() => {
+          clearTimeout(sounds)
+          setMainPageIsOpen(false)
+          setModalOpen(false)
+        }}
+        >
+          Menu
+        </button>
+      </div>
+    </>
+  )
+}
+
 function Modal({ isOpen, onClose, children }) {
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) setAnimate(false)
+  }, [isOpen])
+
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    setAnimate(true);
+    setTimeout(() => {
+      onClose()
+    }, 710);
+  };
 
   return (
     <FocusTrap>
-      <div className="modalOverlay" onClick={onClose}>
-        <div className="modalContent" onClick={e => e.stopPropagation()}>
-          <button className='flameButton' onClick={onClose} aria-label="Close modal">✖</button>
+      <div className="modalOverlay" onClick={handleClose}>
+        <div
+          className={`modalContent ${animate ? 'drop-out' : 'drop-in'}`}
+          onClick={e => e.stopPropagation()}
+        >
+          <button className="flameButton" onClick={handleClose} aria-label="Close modal">✖</button>
           {children}
         </div>
       </div>
@@ -42,4 +86,5 @@ function Modal({ isOpen, onClose, children }) {
 }
 
 
-export { Modal, ModalContent}
+
+export { Modal, ModalContent, ModalGameOver }

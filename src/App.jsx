@@ -39,11 +39,13 @@ function App() {
 
   useEffect(() => {
     prepareCards(setNextCards, level, setCards)
-  }, [])
+  }, [level])
 
   useEffect(() => {
     if (mainPageIsOpen) {
       setTimeout(() => setAnimateMainPage(true), 10)
+    } else {
+      setTimeout(() => setAnimateMainPage(false), 10)
     }
   }, [mainPageIsOpen])
 
@@ -75,6 +77,9 @@ function App() {
             setScore={setScore}
             prepareCards={prepareCards}
             level={level}
+            setModalOpen={setModalOpen}
+            setModalContent={setModalContent}
+            setMainPageIsOpen={setMainPageIsOpen}
           />
   
           <ShowScore score={score} bestScore={bestScore} />

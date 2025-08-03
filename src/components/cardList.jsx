@@ -1,18 +1,23 @@
 import { useEffect, useState, useRef } from 'react'
+import { ModalGameOver } from './modal'
 
-export default function CardList({ cards, setCards, nextCards, setNextCards, clickedCards, setClickedCards, score, setScore, prepareCards, level }) {
+export default function CardList({ setMainPageIsOpen, cards, setCards, nextCards, setNextCards, clickedCards, setClickedCards, score, setScore, prepareCards, level, setModalOpen, setModalContent }) {
   const cardBoxRef = useRef(null)
   const [lastClicked, setLastClicked] = useState(false)
-  const [spinTrigger, setSpinTrigger] = useState(false);
+  const [shouldSpin, setShouldSpin] = useState(false)
+  const cardRefs = useRef([])
+  cardRefs.current = []
 
   const buzzer = new Audio('./sounds/buzzer.mp3');
   const ding = new Audio('./sounds/ding.mp3');
   const woosh = new Audio('./sounds/woosh.mp3');
+  const womp = new Audio('./sounds/womp.mp3');
 
-  const handleClick = (sound) => {
-    sound.currentTime = 0;
-    sound.play();
-  };
+  const handleClick = (sound, time = 0) => {
+    sound.currentTime = time
+    sound.volume = 1.0
+    sound.play()
+  }
 
   useEffect(() => {
     if (lastClicked && cardBoxRef.current) {
@@ -22,8 +27,35 @@ export default function CardList({ cards, setCards, nextCards, setNextCards, cli
       setLastClicked(false)
     }
   }, [cards, lastClicked])
-  
 
+  const setCardRef = (el) => {
+    if (el && !cardRefs.current.includes(el)) {
+      cardRefs.current.push(el)
+    }
+  }
+
+  useEffect(() => {
+    if (!shouldSpin) return
+  
+    cardRefs.current.forEach((cardEl) => {
+      cardEl.animate(
+        [
+          { transform: 'rotateY(360deg)' },
+          { transform: 'rotateY(0deg)' }
+        ],
+        {
+          duration: 600,
+          easing: 'ease-in-out',
+          fill: 'forwards'
+        }
+      )
+    })
+  
+    const timeout = setTimeout(() => setShouldSpin(false), 600)
+    return () => clearTimeout(timeout)
+  }, [shouldSpin])
+  
+  
   return (
     <div 
       className='cardBox' 
@@ -32,29 +64,33 @@ export default function CardList({ cards, setCards, nextCards, setNextCards, cli
     >
       {cards.map((card) => (
         <button
-          className={`card ${spinTrigger ? 'spin' : ''}`}
+          className={`card`}
           key={card.name}
           tabIndex={0}
+          ref={setCardRef}
           onClick={() => {
             const isDuplicate = checkIfDuplicate(clickedCards, card.name)
+            setLastClicked(card.name)
           
             if (isDuplicate) {
-              handleClick(buzzer)
+              handleClick(buzzer, 0.3)
               setScore(0)
               setClickedCards([])
+              setShouldSpin(false)  
+              console.log(lastClicked, 'is a duplicate!')
+              setModalContent(<ModalGameOver setMainPageIsOpen={setMainPageIsOpen} setModalOpen={setModalOpen} sound={() => handleClick(womp)} />)
+              setModalOpen(true)
             } else {
               handleClick(ding)
               const newClicked = [...clickedCards, card.name]
               setClickedCards(newClicked)
               setScore(score + 1)
+              handleClick(woosh, 0.1)
+              setShouldSpin(true)  
             }
           
             setCards(nextCards)
             prepareCards(setNextCards, level, false)
-          
-            setSpinTrigger(false)
-            setTimeout(() => setSpinTrigger(true), 100)
-            setTimeout(() => handleClick(woosh), 200)
           }}     
         >
           <img src={card.url} alt="" /> {card.name}
