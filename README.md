@@ -16,7 +16,7 @@ This approach kept gameplay smooth without waiting for new data during interacti
 ## Features
 
 - **Sound Effects** — This was my first real project with integrated audio. I'm proud of how the sound effects turned out.
-- **Animations** — Added lots of visual feedback for actions like card flips and matches.
+- **Animations** — Added lots of visual feedback for actions like card flips and wrong card picks.
 - **Component Structure** — Focused on organizing my components into a clean file structure for maintainability.
 
 ## Sound Credits
